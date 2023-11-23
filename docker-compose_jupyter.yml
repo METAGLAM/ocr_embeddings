@@ -1,0 +1,46 @@
+version: '3.1'
+
+services:
+  jupyter:
+    image: metaglam_jupyter_environment
+    container_name: metaglam-jupyter
+    build:
+      context: ./
+      dockerfile: Dockerfile_jupyter
+    restart: always
+    user: root
+    environment:
+      - NB_UID=${UID}
+      - NB_GID=${GID}
+      - JUPYTER_TOKEN=metaglam
+      - JUPYTER_ENABLE_LAB=yes
+      - GRANT_SUDO=yes
+    volumes:
+      - ./src:/home/jovyan/work/src
+      - ./notebooks:/home/jovyan/work/notebooks
+      - /data/raw:/data/raw
+      - /data/interim:/data/interim
+      - /data/logs:/data/logs
+      - /data/models:/data/models
+      - /data/processed:/data/processed
+      - /data/external:/data/external
+      - ./config/settings.yaml:/config/settings.yaml
+    ports:
+      - "8888:8888"
+    networks:
+      - my-network
+
+  tensorboard:
+    container_name: tensorboard_metaglam
+    image: tensorflow/tensorflow:2.13.0
+    build: .
+    volumes:
+      - ./data/logs:/data/logs
+    ports:
+      - "6006:6006"
+    command: tensorboard  --logdir=/data/logs/embeddings --bind_all
+    networks:
+      - my-network
+
+networks:
+  my-network:

@@ -1,0 +1,17 @@
+version: '3.1'
+
+services:
+  api:
+    image: metaglam
+    container_name: metaglam-api
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - ./data:/data
+      - ./reports:/reports
+      - ./src:/code/src
+      - ./app:/code/app
+    ports:
+      - "80:80"

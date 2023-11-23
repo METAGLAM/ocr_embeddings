@@ -1,0 +1,182 @@
+logging:
+  formatter:
+    format: '%(asctime)s - %(levelname)s - %(filename)s - %(funcName)s: %(message)s'
+    time_format: '%Y-%m-%d %H:%M:%S'
+  level: DEBUG
+
+volumes:
+  external: /data/external
+  interim: /data/interim
+  logs: /data/logs
+  models: /data/models
+  processed: /data/processed
+  raw: /data/raw
+
+languages:
+  ca: ca
+  en: en
+  es: es
+  fr: fr
+  it: it
+  non: non_identified
+
+embeddings:
+  path: /data/processed/embeddings
+  muse:
+    muse_vector_path: /data/external/MUSE_word_embeddings
+    embedding_size: 300
+    languages:
+      - ca
+      - es
+      - fr
+      - it
+
+  spacy:
+    models:
+      ca: ca_core_news_lg
+#      en: en_core_web_lg
+      es: es_core_news_lg
+      fr: fr_core_news_lg
+      it: it_core_news_lg
+    embedding_size: 300
+    languages:
+      - ca
+#      - en
+      - es
+      - fr
+      - it
+
+  multilingual_transformer:
+    transformer_pipeline:
+      task: feature-extraction
+      tokenizer: bert-base-multilingual-cased
+      model: bert-base-multilingual-cased
+    model_name: bert-base-multilingual-cased
+    text_column: text
+    sequence_len: 512
+    # Available the GPU use
+
+
+### OCR Correction settings
+ocr:
+  load:
+    dictionary_path: data/external/dictionary
+    languages:
+      - lang: "catalan"
+        lang_code: "ca"
+        vocabularies:
+          vowels: [ "a", "e", "i", "o", "u", "à", "è", "é", "í", "ò", "ó", "ú",
+                    "ï", "ö" ]
+          spacy_pipeline: "ca_core_news_sm"
+        spellchecker:
+          corpus: "ca_freq.txt"
+          term_index: 0
+          count_index: 1
+        bert: ../julibert
+        pipeline_task: fill-mask
+        top_k: 10
+
+      - lang: "spanish"
+        lang_code: "es"
+        vocabularies:
+          vowels: [ "a", "e", "i", "o", "u", "á", "é", "í", "ó", "ú", "y" ]
+          spacy_pipeline: "es_core_news_sm"
+        spellchecker:
+          corpus: "es_freq.txt"
+          term_index: 0
+          count_index: 1
+        bert: "dccuchile/bert-base-spanish-wwm-cased"
+        pipeline_task: fill-mask
+        top_k: 10
+
+      - lang: "french"
+        lang_code: "fr"
+        vocabularies:
+          vowels: [ "a", "e", "i", "o", "u", "à", "â", "è", "é", "ê", "í", "î",
+                    "ò", "ó", "ù", "û" ]
+          spacy_pipeline: "fr_core_news_sm"
+        spellchecker:
+          corpus: "fr_freq.txt"
+          term_index: 1
+          count_index: 0
+        bert: "camembert/camembert-base"
+        pipeline_task: fill-mask
+        top_k: 10
+
+      - lang: "italian"
+        lang_code: "it"
+        vocabularies:
+          vowels: [ "a", "e", "i", "o", "u", "à", "á", "è", "é", "ì", "í", "ò",
+                    "ù" ]
+          spacy_pipeline: "it_core_news_sm"
+        spellchecker:
+          corpus: "it_freq.txt"
+          term_index: 1
+          count_index: 0
+        bert: "dbmdz/bert-base-italian-cased"
+        pipeline_task: fill-mask
+        top_k: 10
+
+      #- lang: "english"
+      #  lang_code: "en"
+      #  vocabularies:
+      #    vowels: [ "a", "e", "i", "o", "u" ]
+      #    spacy_pipeline: "en_core_web_sm"
+      #  spellchecker:
+      #    corpus: "en_freq.txt"
+      #    term_index: 0
+      #    count_index: 1
+      #  bert: "bert-base-cased"
+      #  pipeline_task: fill-mask
+      #  top_k: 10
+
+    use_cuda_if_available: True
+
+  transform:
+    path_publicacions: data/raw/Publicacions
+    bloc: 'bloc2'
+
+    preprocess: True
+
+    paragraph:
+      hard_min: 20
+      soft_min: 150
+      max: 200
+
+    hyphen: { "-me", "-se", "-les", "-te", "-ho", "-hi", "-nos", "-vos", "-li",
+              "-ne", "-lo", "-los", "-la" }
+
+    apostrophe: {
+      'ca': { "l'", "L'", "d'", "D'", "s'", "S'", "n'", "'ns",  "'n", "'ls",
+              "t'", "T'", "m'", "M'", "'t", "'T", "'l", "'L", "'n", "'N", "'m" },
+      'fr': { "c'", "qu'", "n'", "l'", "s'", "n'", "j'", "'a", "'à", "'s", "'au",
+              "m'", "t'", "d'" }
+    }
+
+    columns: [ "revista", "publicacio", "idiomes", "es_perc", "ca_perc", "fr_perc",
+               "it_perc", "en_perc", "non_identified_perc", "es_existing",
+               "ca_existing", "fr_existing", "it_existing", "en_existing",
+               "non_identified_existing", "n_words", "total_existing" ]
+
+    steps:
+      use_symspell: False
+      use_bert: True
+
+  save:
+    results_path: data/processed/
+    file:
+      statistics:
+        save: True
+        filepath: "results_{bloc}_processed_bert.csv"
+
+      all_words:
+        save: False
+        filepath: "all_words_{bloc}_processed.json"
+
+      processed_text:
+        save: False
+        filepath: "{bloc}_processed"
+
+      processed_lines:
+        save: False
+        filepath: "processed_lines_{bloc}.json"

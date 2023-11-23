@@ -1,0 +1,16 @@
+FROM jupyter/base-notebook:lab-4.0.2
+
+# expose default Jupyter port
+EXPOSE 8888
+
+COPY config/requirements.txt /app/config/requirements.txt
+RUN pip install --upgrade pip setuptools
+RUN pip install -r /app/config/requirements.txt
+
+COPY config/settings.yaml /config/settings.yaml
+
+RUN python3 -m spacy download ca_core_news_lg
+RUN python3 -m spacy download en_core_web_lg
+RUN python3 -m spacy download es_core_news_lg
+RUN python3 -m spacy download fr_core_news_lg
+RUN python3 -m spacy download it_core_news_lg
