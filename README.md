@@ -1,4 +1,4 @@
-This repository contains the code of the paper "Turning a Multilingual Historical Archive into an Information System through Post-OCR Correction and Content-Based Indexation".
+This repository contains the code of the paper "Turning a Multilingual Historical Archive into an Information System through Post-OCR Correction and Content-Based Indexation" (Casals, Piras, Murillo, 2023)
 
 ### Abstract
 
