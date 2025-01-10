@@ -1,6 +1,6 @@
 This repository contains the code of the paper "Improving the Quality of Document Embeddings with Post-OCR Correction on a Multilingual Historical Corpus" (Piras, Rosell, Casals, 2025)
 
-The dataset, which includes scanned documents of the Biblioteca Nacional de Catalunya, together with their OCR texts, can be found at https://zenodo.org/records/10201752.
+The dataset, which includes scanned documents of the Biblioteca Nacional de Catalunya, together with their OCR texts, can be found at https://zenodo.org/records/14628712.
 
 ### Abstract
 
